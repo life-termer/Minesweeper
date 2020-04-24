@@ -1,15 +1,57 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-public class MinesweeperGame implements ActionListener {
+public class MinesweeperGame extends MouseAdapter implements ActionListener {
+    GameField gameField;                                             //Declaring game field
+    Icon rs2 = new ImageIcon("icons/reset1.png");            //Another reset icon
+    Icon openTile = new ImageIcon("icons/emptyTile.png");    //Empty tile icon
+    Icon bomb = new ImageIcon("icons/bomb.png");             //Bomb icon
+    Icon flag = new ImageIcon("icons/flag.png");             //Flag icon
 
+    public MinesweeperGame() {
+        gameField = new GameField(250, 250, 10, 10, 12);   //Creating new game field
+        for (GameObject button : gameField.buttons) {         //Adding Action Listener to all buttons
+            button.addActionListener(this);
+            button.addMouseListener(this);
+        }
+        gameField.reset.addActionListener(this);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            for (GameObject button : gameField.buttons) {
+                if (e.getSource() == button) {
+                    button.setIcon(flag);
+                    //button.setBackground(Color.red);
+                }
+            }
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        if (e.getSource() == gameField.reset)
+            gameField.reset.setIcon(rs2);
+        for (GameObject button : gameField.buttons) {
+            if (e.getSource() == button) {
+                //button.setIcon(openTile);
+                //button.setFocusPainted(false);
+                //button.setBorderPainted(false);
+                //button.setContentAreaFilled(false);
+                button.setEnabled(false);
+                //button.setBackground(Color.red);
+            }
+        }
     }
 }
+
+
+
 
 /*
 panel.addMouseListener(new MouseAdapter() {
