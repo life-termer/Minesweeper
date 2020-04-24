@@ -3,7 +3,7 @@ import java.awt.*;
 
 public class GameField extends JFrame {
     public GameObject buttons[];                            //Array of buttons
-    private JPanel panelMain;                               //Panel were will be buttons
+    public JPanel panelMain;                               //Panel were will be buttons
     public JButton reset, leftMines, score;                 //Some top buttons
     Icon rs = new ImageIcon("icons/reset.png");     //Reset button icon
     Icon tile = new ImageIcon("icons/tile.png");    //Close tile icon
@@ -19,6 +19,7 @@ public class GameField extends JFrame {
         panelMain.setLayout(new GridLayout(row, col));      //Setting GridLayoud, filling array with
         for(int i = 0; i < (row * col); i++){               //button and setting buttons icons
             buttons[i] = new GameObject(false);
+            //buttons[i].setFont(new Font("Arial", Font.PLAIN, 44));
             buttons[i].setIcon(tile);
             panelMain.add(buttons[i]);                      //Adding buttons to panel
         }

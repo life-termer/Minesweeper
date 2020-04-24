@@ -5,9 +5,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MinesweeperGame extends MouseAdapter implements ActionListener {
+public class MinesweeperGame extends MouseAdapter {
     GameField gameField;                                             //Declaring game field
     Icon rs2 = new ImageIcon("icons/reset1.png");            //Another reset icon
+    Icon open = new ImageIcon("icons/open.png");
+    Icon dead = new ImageIcon("icons/dead.png");
     Icon openTile = new ImageIcon("icons/emptyTile.png");    //Empty tile icon
     Icon bomb = new ImageIcon("icons/bomb.png");             //Bomb icon
     Icon flag = new ImageIcon("icons/flag.png");             //Flag icon
@@ -15,14 +17,13 @@ public class MinesweeperGame extends MouseAdapter implements ActionListener {
     public MinesweeperGame() {
         gameField = new GameField(250, 250, 10, 10, 12);   //Creating new game field
         for (GameObject button : gameField.buttons) {         //Adding Action Listener to all buttons
-            button.addActionListener(this);
             button.addMouseListener(this);
         }
-        gameField.reset.addActionListener(this);
+        gameField.reset.addMouseListener(this);
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {  //Switch
         if (e.getButton() == MouseEvent.BUTTON3) {
             for (GameObject button : gameField.buttons) {
                 if (e.getSource() == button) {
@@ -31,20 +32,40 @@ public class MinesweeperGame extends MouseAdapter implements ActionListener {
                 }
             }
         }
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            for (GameObject button : gameField.buttons) {
+                if (e.getSource() == button) {
+                    //button.setIcon(openTile);
+                    //button.setBackground(Color.red);
+                    button.setIcon(null);
+                    button.setBackground(Color.white);
+                    //button.setEnabled(false);
+                }
+            }
+        }
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == gameField.reset)
+    public void mousePressed(MouseEvent e) {
+        if (e.getSource() == gameField.reset && SwingUtilities.isLeftMouseButton(e))
             gameField.reset.setIcon(rs2);
+
+        for (GameObject button : gameField.buttons) {
+            if (e.getSource() == button && SwingUtilities.isLeftMouseButton(e)) {
+                gameField.reset.setIcon(dead);
+            }
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.getSource() == gameField.reset) {
+            gameField.reset.setIcon(gameField.rs);
+        }
+
         for (GameObject button : gameField.buttons) {
             if (e.getSource() == button) {
-                //button.setIcon(openTile);
-                //button.setFocusPainted(false);
-                //button.setBorderPainted(false);
-                //button.setContentAreaFilled(false);
-                button.setEnabled(false);
-                //button.setBackground(Color.red);
+                gameField.reset.setIcon(gameField.rs);
             }
         }
     }
