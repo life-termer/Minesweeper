@@ -15,7 +15,7 @@ public class MinesweeperGame extends MouseAdapter {
     private int countMinesOnField;
     private int countFlags;
     private boolean isGameStopped;
-    private int countClosedTiles = side * side;
+    private int countClosedTiles;
     private int score;
     private static final Icon rs2 = new ImageIcon("icons/reset1.png");            //Another reset icons
     private static final Icon open = new ImageIcon("icons/open.png");
@@ -24,20 +24,28 @@ public class MinesweeperGame extends MouseAdapter {
     private static final Icon bomb = new ImageIcon("icons/bomb.png");             //Bomb icon
     private static final Icon flag = new ImageIcon("icons/flag.png");             //Flag icon
     private static final Icon i1 = new ImageIcon("icons/2.png");
-    private Random random;
 
     public MinesweeperGame() {
         gameField = new GameField(250, 250, side);   //Creating new game field
+        for (int i = 0; i < side; i++) {
+            for (int j = 0; j < side; j++) {                                //Adding Mouse Listener to all buttons
+                gameField.buttons[i][j].addMouseListener(this);
+            }
+        }
+        gameField.reset.addMouseListener(this);
         createGame();
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {                    //Switch
+    public void mouseClicked(MouseEvent e) {
         switch (e.getButton()) {
             case MouseEvent.BUTTON1: {
+                if (e.getSource() == gameField.reset) {
+                    restart();
+                }
                 for (int i = 0; i < side; i++) {
                     for (int j = 0; j < side; j++) {
-                        if (e.getSource() == gameField.buttons[i][j]){
+                        if (e.getSource() == gameField.buttons[i][j]) {
                             openTile(gameField.buttons[i][j]);
                         }
                     }
@@ -47,7 +55,7 @@ public class MinesweeperGame extends MouseAdapter {
             case MouseEvent.BUTTON3: {
                 for (int i = 0; i < side; i++) {
                     for (int j = 0; j < side; j++) {
-                        if (e.getSource() == gameField.buttons[i][j]){
+                        if (e.getSource() == gameField.buttons[i][j]) {
                             markTile(gameField.buttons[i][j]);
                         }
                     }
@@ -87,44 +95,53 @@ public class MinesweeperGame extends MouseAdapter {
         }
     }
 
-    public void openTile(GameObject object){
-        if(!object.isFlag && !object.isOpen && !isGameStopped){
-            if(object.isMine){
+    private void openTile(GameObject object) {
+        if (!object.isFlag && !object.isOpen && !isGameStopped) {
+            if (object.isMine) {
                 object.setIcon(bomb);
                 object.isOpen = true;
                 object.setBackground(Color.white);
-                countMinesOnField--;
-                gameField.leftMines.setText(String.valueOf(countMinesOnField));
-            }else if (object.countMineNeighbors == 0){
+                countClosedTiles--;
+            } else if (object.countMineNeighbors == 0) {
                 object.isOpen = true;
                 object.setIcon(null);
                 object.setEnabled(false);
+                countClosedTiles--;
                 List<GameObject> objects = getNeighbors(object);
                 for (GameObject gameObject : objects) {
                     if (!gameObject.isOpen) openTile(gameObject);
                 }
-            }else {
+            } else {
                 object.isOpen = true;
                 object.setIcon(i1);
                 object.setEnabled(false);
+                countClosedTiles--;
             }
         }
     }
 
-    public void markTile(GameObject object){
-        if(!object.isFlag && !object.isOpen && !isGameStopped){
+    private void markTile(GameObject object) {
+        if (!object.isFlag && !object.isOpen && !isGameStopped) {
             object.isFlag = true;
             countFlags--;
+            gameField.leftMines.setText(String.valueOf(countFlags));
             object.setIcon(flag);
-        }else if (!object.isOpen && object.isFlag && !isGameStopped){
+        } else if (!object.isOpen && object.isFlag && !isGameStopped) {
             object.isFlag = false;
             countFlags++;
+            gameField.leftMines.setText(String.valueOf(countFlags));
             object.setIcon(gameField.tile);
         }
     }
 
-    public void createGame() {
-        random = new Random();
+    private void createGame() {
+        isGameStopped = false;
+        countClosedTiles = side * side;
+        countMinesOnField = mines;
+        countFlags = countMinesOnField;
+        gameField.leftMines.setText(String.valueOf(countFlags));
+
+        Random random = new Random();
         for (int i = 0; i < mines; i++) {
             while (true) {
                 int x = random.nextInt(side);
@@ -135,20 +152,11 @@ public class MinesweeperGame extends MouseAdapter {
                 }
             }
         }
-        for (int i = 0; i < side; i++) {
-            for (int j = 0; j < side; j++) {                                //Adding Mouse Listener to all buttons
-                if (gameField.buttons[i][j].isMine) countMinesOnField++;
-                gameField.buttons[i][j].addMouseListener(this);
-            }
-        }
-        gameField.reset.addMouseListener(this);                              //Adding Mouse Listener to the reset button
-        countMineNeighbors();
-        countMinesOnField = mines;
-        countFlags = countMinesOnField;
 
+        countMineNeighbors();
     }
 
-    public void countMineNeighbors() {
+    private void countMineNeighbors() {
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {
                 if (gameField.buttons[i][j].isMine) continue;
@@ -162,7 +170,7 @@ public class MinesweeperGame extends MouseAdapter {
         }
     }
 
-    public List<GameObject> getNeighbors(GameObject gameObject) {
+    private List<GameObject> getNeighbors(GameObject gameObject) {
         List<GameObject> result = new ArrayList<>();
         for (int i = gameObject.x - 1; i <= gameObject.x + 1; i++) {
             for (int j = gameObject.y - 1; j <= gameObject.y + 1; j++) {
@@ -179,5 +187,33 @@ public class MinesweeperGame extends MouseAdapter {
             }
         }
         return result;
+    }
+
+    private void gameOver() {
+
+    }
+
+    private void win() {
+
+    }
+
+    private void restart() {
+        for (int i = 0; i < side; i++) {
+            for (int j = 0; j < side; j++) {
+                gameField.buttons[i][j].setEnabled(true);
+                gameField.buttons[i][j].setIcon(gameField.tile);
+                gameField.buttons[i][j].x = i;
+                gameField.buttons[i][j].y = j;
+                gameField.buttons[i][j].isOpen = false;
+                gameField.buttons[i][j].isMine = false;
+                gameField.buttons[i][j].isFlag = false;
+
+            }
+        }
+        createGame();
+    }
+
+    private void showMines() {
+
     }
 }
