@@ -4,6 +4,5 @@ public class Main {
         //new GameField(400,400, 16,16,40);
         //new GameField(600,600, 24,24,99);
         new MinesweeperGame();
-        System.out.println();
     }
 }

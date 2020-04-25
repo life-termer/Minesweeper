@@ -23,6 +23,7 @@ public class GameField extends JFrame {
                 buttons[i][j].x = i;
                 buttons[i][j].y = j;
                 buttons[i][j].setIcon(tile);
+                buttons[i][j].setBackground(Color.white);
                 panelMain.add(buttons[i][j]);
             }                      //Adding buttons to panel
         }
@@ -30,7 +31,7 @@ public class GameField extends JFrame {
         //Initializing, setting positions, text, background and colors for top buttons
         leftMines = new JButton();
         //leftMines.setEnabled(false);
-        score = new JButton("999");
+        score = new JButton("0");
         reset = new JButton();
         reset.setIcon(rs);
         leftMines.setBounds(10, 10, 50, 40);
