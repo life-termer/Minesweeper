@@ -4,44 +4,64 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Random;
 
 public class MinesweeperGame extends MouseAdapter {
-    GameField gameField;                                             //Declaring game field
-    Icon rs2 = new ImageIcon("icons/reset1.png");            //Another reset icon
-    Icon open = new ImageIcon("icons/open.png");
-    Icon dead = new ImageIcon("icons/dead.png");
-    Icon openTile = new ImageIcon("icons/emptyTile.png");    //Empty tile icon
-    Icon bomb = new ImageIcon("icons/bomb.png");             //Bomb icon
-    Icon flag = new ImageIcon("icons/flag.png");             //Flag icon
+    private static int side = 10;
+    private static int mines = 10;
+    private final GameField gameField;                                             //Declaring game field
+    private int countMinesOnField;
+    private int countFlags;
+    private boolean isGameStopped;
+    private int countClosedTiles = side * side;
+    private int score;
+    private static final Icon rs2 = new ImageIcon("icons/reset1.png");            //Another reset icons
+    private static final Icon open = new ImageIcon("icons/open.png");
+    private static final Icon dead = new ImageIcon("icons/dead.png");
+    private static final Icon openTile = new ImageIcon("icons/emptyTile.png");    //Empty tile icon
+    private static final Icon bomb = new ImageIcon("icons/bomb.png");             //Bomb icon
+    private static final Icon flag = new ImageIcon("icons/flag.png");             //Flag icon
+    private static final Icon i1 = new ImageIcon("icons/2.png");
+    private Random random;
 
     public MinesweeperGame() {
-        gameField = new GameField(250, 250, 10, 10, 12);   //Creating new game field
-        for (GameObject button : gameField.buttons) {         //Adding Action Listener to all buttons
-            button.addMouseListener(this);
-        }
-        gameField.reset.addMouseListener(this);
+        gameField = new GameField(250, 250, side, side);   //Creating new game field
+        createGame();
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {  //Switch
-        if (e.getButton() == MouseEvent.BUTTON3) {
-            for (GameObject button : gameField.buttons) {
-                if (e.getSource() == button) {
-                    button.setIcon(flag);
-                    //button.setBackground(Color.red);
+    public void mouseClicked(MouseEvent e) {                    //Switch
+        switch (e.getButton()) {
+            case MouseEvent.BUTTON1: {                          //Getting a mouse button
+                for (GameObject button : gameField.buttons) {
+                    if (e.getSource() == button && !button.isMine && !button.isOpen) {
+                        button.setIcon(i1);
+                        button.isOpen = true;
+                        button.setBackground(Color.white);
+                        button.setFocusPainted(false);
+                        //button.setBorderPainted(false);
+                        //button.setContentAreaFilled(false);
+                        button.setEnabled(false);
+                    }
+                    if (e.getSource() == button && button.isMine && !button.isOpen) {
+                        button.setIcon(bomb);
+                        button.isOpen = true;
+                        button.setBackground(Color.white);
+                        countMinesOnField--;
+                        gameField.leftMines.setText(String.valueOf(countMinesOnField));
+                    }
                 }
             }
-        }
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            for (GameObject button : gameField.buttons) {
-                if (e.getSource() == button) {
-                    //button.setIcon(openTile);
-                    //button.setBackground(Color.red);
-                    button.setIcon(null);
-                    button.setBackground(Color.white);
-                    //button.setEnabled(false);
+            break;
+            case MouseEvent.BUTTON3: {
+                for (GameObject button : gameField.buttons) {
+                    if (e.getSource() == button  && !button.isOpen) {
+                        button.setIcon(flag);
+                        //button.setBackground(Color.red);
+                    }
                 }
             }
+            break;
         }
     }
 
@@ -51,8 +71,8 @@ public class MinesweeperGame extends MouseAdapter {
             gameField.reset.setIcon(rs2);
 
         for (GameObject button : gameField.buttons) {
-            if (e.getSource() == button && SwingUtilities.isLeftMouseButton(e)) {
-                gameField.reset.setIcon(dead);
+            if (e.getSource() == button && SwingUtilities.isLeftMouseButton(e) && !button.isOpen) {
+                gameField.reset.setIcon(open);
             }
         }
     }
@@ -64,10 +84,30 @@ public class MinesweeperGame extends MouseAdapter {
         }
 
         for (GameObject button : gameField.buttons) {
-            if (e.getSource() == button) {
+            if (e.getSource() == button && !button.isOpen) {
                 gameField.reset.setIcon(gameField.rs);
             }
         }
+    }
+
+    public void createGame() {
+        random = new Random();
+        for (int i = 0; i < mines; i++) {
+            while (true) {
+                int r = random.nextInt(side * side);
+                if (!gameField.buttons[r].isMine) {
+                    gameField.buttons[r].isMine = true;
+                    break;
+                }
+            }
+        }
+        for (GameObject button : gameField.buttons) {                           //Adding Mouse Listener to all buttons
+            if (button.isMine) countMinesOnField++;
+            button.addMouseListener(this);
+        }
+        gameField.reset.addMouseListener(this);                              //Adding Mouse Listener to the reset button
+        countMinesOnField = mines;
+
     }
 }
 

@@ -10,7 +10,7 @@ public class GameField extends JFrame {
     Image icon = Toolkit.getDefaultToolkit().getImage("icons/minesweeper.png");//Game icon
 
 
-    public GameField(int x, int y, int row, int col, int mines) {
+    public GameField(int x, int y, int row, int col) {
         super("Minesweeper");                           //Game title
         buttons = new GameObject[row * col];                //Initializing array of buttons
         panelMain = new JPanel();
@@ -31,7 +31,7 @@ public class GameField extends JFrame {
         reset = new JButton();
         reset.setIcon(rs);
         leftMines.setBounds(10,10,50,40);
-        leftMines.setText(String.valueOf(mines));
+        leftMines.setText("12");
         reset.setBounds((x/2) - 10 ,10,40,40);
         score.setBounds(x-50,10,60,40);
         leftMines.setBackground(Color.GRAY);

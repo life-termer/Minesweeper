@@ -12,4 +12,8 @@ public class GameObject extends JButton{
         this.isMine = isMine;
     }
 
+    /*public void setMine(boolean isMine){
+        this.isMine = isMine;
+    }*/
+
 }
