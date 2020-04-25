@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Timer;
 
 public class MinesweeperGame extends MouseAdapter implements Runnable {
-    public static int time;
     Thread t = null;
     private static int side = 10;
     private static int mines = 12;
@@ -31,8 +30,10 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
     private static final Icon i6 = new ImageIcon("icons/6.png");
     private static final Icon i7 = new ImageIcon("icons/7.png");
     private static final Icon i8 = new ImageIcon("icons/8.png");
+    private int time;
 
     public MinesweeperGame() {
+        t = new Thread(this);
         gameField = new GameField(240, 240, side);   //Creating new game field
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {                                //Adding Mouse Listener to all buttons
@@ -41,6 +42,9 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
         }
         gameField.reset.addMouseListener(this);
         createGame();
+
+        t.start();
+
     }
 
     @Override
@@ -48,7 +52,10 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
         switch (e.getButton()) {
             case MouseEvent.BUTTON1: {
                 if (e.getSource() == gameField.reset) {
+                    //firstClick = false;
                     restart();
+                    //minutes = 0;
+                    gameField.score.setText("--   :   --");
                 }
                 for (int i = 0; i < side; i++) {
                     for (int j = 0; j < side; j++) {
@@ -175,8 +182,6 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
 
     private void createGame() {
         time = 0;
-        t = new Thread(this);
-        t.start();
         isGameStopped = false;
         countClosedTiles = side * side;
         countMinesOnField = mines;
@@ -271,9 +276,22 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
 
     @Override
     public void run() {
+        int minutes = 0;
         try {
-            while (!isGameStopped) {
-                gameField.score.setText(String.valueOf(time));
+            while (true) {
+                if (time == 60) {
+                    time = 0;
+                    minutes++;
+                }
+                //if (time % 60 == 0 && time != 0) minutes++;
+                while (isGameStopped) {
+                    minutes = 0;
+                    gameField.score.setText(gameField.score.getText());
+                }
+                if (minutes < 10 && time < 10) gameField.score.setText("0" + minutes + " : " +"0" + time);
+                else if (minutes > 9 && time < 10) gameField.score.setText(minutes + " : " + "0" + time);
+                else if (minutes < 10) gameField.score.setText("0" + minutes + " : " + time);
+                else gameField.score.setText(minutes + " : " + time);
                 time++;
                 Thread.sleep(1000);
             }
