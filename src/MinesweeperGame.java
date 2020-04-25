@@ -34,26 +34,11 @@ public class MinesweeperGame extends MouseAdapter {
     @Override
     public void mouseClicked(MouseEvent e) {                    //Switch
         switch (e.getButton()) {
-            case MouseEvent.BUTTON1: {                          //Getting a mouse button
+            case MouseEvent.BUTTON1: {
                 for (int i = 0; i < side; i++) {
                     for (int j = 0; j < side; j++) {
-                        if (e.getSource() == gameField.buttons[i][j] && !gameField.buttons[i][j].isFlag
-                                && !gameField.buttons[i][j].isOpen && !isGameStopped) {
-                            if (gameField.buttons[i][j].isMine) {
-                                gameField.buttons[i][j].setIcon(bomb);
-                                gameField.buttons[i][j].isOpen = true;
-                                gameField.buttons[i][j].setBackground(Color.white);
-                                countMinesOnField--;
-                                gameField.leftMines.setText(String.valueOf(countMinesOnField));
-                            }else if(gameField.buttons[i][j].countMineNeighbors == 0){
-                                gameField.buttons[i][j].isOpen = true;
-                                gameField.buttons[i][j].setIcon(null);
-                                gameField.buttons[i][j].setEnabled(false);
-                            }else {
-                                gameField.buttons[i][j].isOpen = true;
-                                gameField.buttons[i][j].setIcon(i1);
-                                gameField.buttons[i][j].setEnabled(false);
-                            }
+                        if (e.getSource() == gameField.buttons[i][j]){
+                            openTile(gameField.buttons[i][j]);
                         }
                     }
                 }
@@ -62,16 +47,8 @@ public class MinesweeperGame extends MouseAdapter {
             case MouseEvent.BUTTON3: {
                 for (int i = 0; i < side; i++) {
                     for (int j = 0; j < side; j++) {
-                        if (e.getSource() == gameField.buttons[i][j] && !gameField.buttons[i][j].isOpen
-                                && !gameField.buttons[i][j].isFlag && !isGameStopped) {
-                            gameField.buttons[i][j].isFlag = true;
-                            countFlags--;
-                            gameField.buttons[i][j].setIcon(flag);
-                        } else if (e.getSource() == gameField.buttons[i][j] && !gameField.buttons[i][j].isOpen
-                                && gameField.buttons[i][j].isFlag && !isGameStopped) {
-                            gameField.buttons[i][j].isFlag = false;
-                            countFlags++;
-                            gameField.buttons[i][j].setIcon(gameField.tile);
+                        if (e.getSource() == gameField.buttons[i][j]){
+                            markTile(gameField.buttons[i][j]);
                         }
                     }
                 }
@@ -110,6 +87,42 @@ public class MinesweeperGame extends MouseAdapter {
         }
     }
 
+    public void openTile(GameObject object){
+        if(!object.isFlag && !object.isOpen && !isGameStopped){
+            if(object.isMine){
+                object.setIcon(bomb);
+                object.isOpen = true;
+                object.setBackground(Color.white);
+                countMinesOnField--;
+                gameField.leftMines.setText(String.valueOf(countMinesOnField));
+            }else if (object.countMineNeighbors == 0){
+                object.isOpen = true;
+                object.setIcon(null);
+                object.setEnabled(false);
+                List<GameObject> objects = getNeighbors(object);
+                for (GameObject gameObject : objects) {
+                    if (!gameObject.isOpen) openTile(gameObject);
+                }
+            }else {
+                object.isOpen = true;
+                object.setIcon(i1);
+                object.setEnabled(false);
+            }
+        }
+    }
+
+    public void markTile(GameObject object){
+        if(!object.isFlag && !object.isOpen && !isGameStopped){
+            object.isFlag = true;
+            countFlags--;
+            object.setIcon(flag);
+        }else if (!object.isOpen && object.isFlag && !isGameStopped){
+            object.isFlag = false;
+            countFlags++;
+            object.setIcon(gameField.tile);
+        }
+    }
+
     public void createGame() {
         random = new Random();
         for (int i = 0; i < mines; i++) {
@@ -139,20 +152,20 @@ public class MinesweeperGame extends MouseAdapter {
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {
                 if (gameField.buttons[i][j].isMine) continue;
-                List<GameObject> result = getNeighbors(gameField.buttons[i][j],i,j);
+                List<GameObject> result = getNeighbors(gameField.buttons[i][j]);
                 int cnt = 0;
-                for(GameObject gameObject : result){
-                    if(gameObject.isMine) cnt++;
+                for (GameObject gameObject : result) {
+                    if (gameObject.isMine) cnt++;
                 }
                 gameField.buttons[i][j].countMineNeighbors = cnt;
             }
         }
     }
 
-    public List<GameObject> getNeighbors(GameObject gameObject, int x, int y) {
+    public List<GameObject> getNeighbors(GameObject gameObject) {
         List<GameObject> result = new ArrayList<>();
-        for (int i = x - 1; i <= x + 1; i++) {
-            for (int j = y - 1; j <= y + 1; j++) {
+        for (int i = gameObject.x - 1; i <= gameObject.x + 1; i++) {
+            for (int j = gameObject.y - 1; j <= gameObject.y + 1; j++) {
                 if (i < 0 || i >= side) {
                     continue;
                 }
@@ -168,34 +181,3 @@ public class MinesweeperGame extends MouseAdapter {
         return result;
     }
 }
-
-
-
-
-/*
-panel.addMouseListener(new MouseAdapter() {
-
-@Override
-public void mouseClicked(MouseEvent e) {
-        if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 1) {
-        // whatever
-        }
-        }
-        });*/
-
-/*
-    final JLabel lblRightClickMe = new JLabel("Right click me");        //create a label
-lblRightClickMe.setBounds(152, 119, 94, 14);
-final JPopupMenu jpm = new JPopupMenu("Hello");                     //create a JPopupMenu
-        jpm.add("Right");jpm.add("Clicked");jpm.add("On");                  //add some elements
-        jpm.add("This");jpm.add("Label");
-        lblRightClickMe.setComponentPopupMenu(jpm);                         //set jpm as this label's popup menu
-
-        lblRightClickMe.addMouseListener(new MouseAdapter() {
-@Override
-public void mouseClicked(MouseEvent arg0) {
-        if (arg0.getButton() == MouseEvent.BUTTON3){                //get the mouse button
-        jpm.show(arg0.getComponent(), arg0.getX(), arg0.getY());//set the position and show the popup menu
-        }
-        }
-        });*/

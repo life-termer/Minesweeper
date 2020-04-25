@@ -20,6 +20,8 @@ public class GameField extends JFrame {
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {
                 buttons[i][j] = new GameObject(false);
+                buttons[i][j].x = i;
+                buttons[i][j].y = j;
                 buttons[i][j].setIcon(tile);
                 panelMain.add(buttons[i][j]);
             }                      //Adding buttons to panel
