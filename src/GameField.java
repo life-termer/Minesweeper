@@ -3,7 +3,6 @@ import java.awt.*;
 
 public class GameField extends JFrame {
     public GameObject[][] buttons;                            //Array of buttons
-    public GameObject bn;
     public JPanel panelMain;                               //Panel were will be buttons
     public JButton reset, leftMines, score;                 //Some top buttons
     Icon rs = new ImageIcon("icons/reset.png");     //Reset button icon
