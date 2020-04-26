@@ -7,7 +7,7 @@ import java.util.Timer;
 
 public class MinesweeperGame extends MouseAdapter implements Runnable, ActionListener {
     Thread t = new Thread(this);
-    public  int side;
+    public int side;
     private int mines;
     public static GameField gameField;                                             //Declaring game field
     private int countMinesOnField;
@@ -29,55 +29,66 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
     private static final Icon i8 = new ImageIcon("icons/8.png");
     private GameType gameType = GameType.BEGINNER;
     private int time;
-    public static String bestTimes;
-    //private String bestT;
-    private String result;
-    private int beginnerBest = 999;
-    private int interBest = 999;
-    private int expertBest = 999;
+    private String beginnerResult;
+    private String interResult;
+    private String expertResult;
+    private int beginnerBest;
+    private int interBest;
+    private int expertBest;
 
     private boolean firstClick;
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == gameField.newItem) {
+        if (e.getSource() == gameField.newItem) {
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.BEGINNER;
-            initGame(240,10,5);
+            initGame(240, 10, 5);
         }
-        if(e.getSource() == gameField.beginner){
+        if (e.getSource() == gameField.beginner) {
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.BEGINNER;
-            initGame(240,10,5);
+            initGame(240, 10, 5);
         }
-        if(e.getSource() == gameField.intermediate){
+        if (e.getSource() == gameField.intermediate) {
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.INTERMEDIATE;
-            initGame(400,16,40);
+            initGame(400, 16, 5);
         }
-        if(e.getSource() == gameField.expert){
+        if (e.getSource() == gameField.expert) {
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.EXPERT;
-            initGame(550,22,99);
+            initGame(550, 22, 5);
         }
-        if(e.getSource() == gameField.bestT){
-            JOptionPane.showMessageDialog(gameField, result, "Fastest Mines Sweepers",JOptionPane.PLAIN_MESSAGE);
+        if (e.getSource() == gameField.bestT) {
+            Object[] options = {"OK", "Reset"};
+            String bestResults = beginnerResult  + interResult + expertResult;
+            int n = JOptionPane.showOptionDialog(gameField, bestResults, "Best Mine Swappers",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+                    null, options,options[0]);
+            if(n == 1) {
+                resetScore();
+            }
         }
 
-        if(e.getSource() == gameField.exit){
+        if (e.getSource() == gameField.exit) {
             gameField.dispatchEvent(new WindowEvent(gameField, WindowEvent.WINDOW_CLOSING));
         }
+        /*if(e.getSource() == gameField.ok){
+            gameField.dialog.setVisible(false);
+        }*/
     }
 
     public MinesweeperGame() {
-        //beginnerBest = 999;  //Must be uploaded from file
-        initGame(240,10,5);
+        resetScore();
+        initGame(240, 10, 3);
     }
 
-    public void initGame (int xy, int side, int mines) {
+    public void initGame(int xy, int side, int mines) {
         this.side = side;
         this.mines = mines;
         gameField = new GameField(xy, xy, side);   //Creating new game field
@@ -94,14 +105,11 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         gameField.exit.addActionListener(this);
         gameField.bestT.addActionListener(this);
 
-        bestTimes = "Novice       999      unknown\n" +
-                "Intermediate     999      unknown\n" +
-                "Expert           999      unknown";
-
         createGame();
-        if(!t.isAlive())
-        t.start();
+        if (!t.isAlive())
+            t.start();
     }
+
     @Override
     public void mouseClicked(MouseEvent e) {
         switch (e.getButton()) {
@@ -131,6 +139,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
             break;
         }
     }
+
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getSource() == gameField.reset && SwingUtilities.isLeftMouseButton(e))
@@ -145,6 +154,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
             }
         }
     }
+
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getSource() == gameField.reset) {
@@ -211,7 +221,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                 }
             }
         }
-        if (countMinesOnField == countClosedTiles && !object.isMine) {
+        if (countMinesOnField == countClosedTiles && !object.isMine && !isGameStopped) {
             win();
             gameField.reset.setIcon(rs2);
         }
@@ -295,6 +305,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
 
     private void win() {
         showMines();
+
         isGameStopped = true;
         bestTimes();
     }
@@ -325,10 +336,11 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
             }
         }
     }
+
     @Override
     public void run() {
         try {
-            while (true) {
+            while (time < 1000) {
                 while (isGameStopped || !firstClick) {
                     gameField.score.setText(gameField.score.getText());
                 }
@@ -343,15 +355,14 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
-    private void bestTimes(){
+    private void bestTimes() {
         String beginner = "";
         String inter = "";
         String expert = "";
-        String name = "";
-        switch (gameType){
+        switch (gameType) {
             case BEGINNER: {
-                if(time < beginnerBest){
-                    beginner = (String)JOptionPane.showInputDialog(
+                if (time < beginnerBest) {
+                    beginner = (String) JOptionPane.showInputDialog(
                             gameField,
                             "You set the best beginner time!\n"
                                     + "Enter your name:",
@@ -359,10 +370,14 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                             JOptionPane.PLAIN_MESSAGE
                     );
                 }
+                beginnerBest = time;
+                beginnerResult = "Beginner             " + beginnerBest +
+                        " seconds       " + beginner + "\n\n";
             }
-            case INTERMEDIATE:{
-                if(time < interBest){
-                    inter = (String)JOptionPane.showInputDialog(
+            break;
+            case INTERMEDIATE: {
+                if (time < interBest) {
+                    inter = (String) JOptionPane.showInputDialog(
                             gameField,
                             "You set the best intermediate time!\n"
                                     + "Enter your name:",
@@ -370,18 +385,35 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                             JOptionPane.PLAIN_MESSAGE
                     );
                 }
+                interBest = time;
+                interResult ="Intermediate      " + interBest +
+                        " seconds       " + inter + "\n\n";
             }
-            case EXPERT:{
-                if(time < expertBest){
-                    expert = (String)JOptionPane.showInputDialog(
+            break;
+            case EXPERT: {
+                if (time < expertBest) {
+                    expert = (String) JOptionPane.showInputDialog(
                             gameField,
                             "You set the best expert time!\n"
                                     + "Enter your name:",
                             "Best Time!",
                             JOptionPane.PLAIN_MESSAGE
                     );
+                    expertBest = time;
+                    expertResult ="Expert                 " + expertBest +
+                            " seconds       " + expert + "\n\n";
                 }
+                break;
             }
         }
+    }
+
+    private void resetScore(){
+        beginnerResult = "Beginner             999 seconds       Unknown\n\n";
+        interResult = "Intermediate      999 seconds       Unknown\n\n";
+        expertResult = "Expert                 999 seconds       Unknown\n\n";
+        beginnerBest = 999;
+        interBest = 999;
+        expertBest = 999;
     }
 }

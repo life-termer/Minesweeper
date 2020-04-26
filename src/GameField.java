@@ -8,8 +8,10 @@ import java.awt.event.WindowEvent;
 public class GameField extends JFrame {
     public GameObject[][] buttons;                            //Array of buttons
     public JPanel panelMain;                               //Panel were will be buttons
-    public JButton reset, leftMines, score;                 //Some top buttons
+    public JButton reset, leftMines, score, ok;                 //Some top buttons
     public JMenuBar menuBar;
+    //public JDialog dialog;
+    //public JLabel bLabel, iLabel, eLabel;
     JMenuItem newItem;
     JMenuItem beginner;
     JMenuItem intermediate;
@@ -83,6 +85,22 @@ public class GameField extends JFrame {
         gameMenu.add(intermediate);gameMenu.add(expert);gameMenu.addSeparator();
         gameMenu.add(bestT); gameMenu.addSeparator();
         gameMenu.add(exit);
+
+        /*dialog = new JDialog(this, "Best Mine Swappers", true);
+        dialog.setLayout(new FlowLayout(FlowLayout.CENTER));
+        ok = new JButton("OK");
+        bLabel = new JLabel("<html><pre><u>Beginner</u>      999 second    Unknown</pre></html>");
+        iLabel = new JLabel("<html><pre>Intermediate  999 second    Unknown</pre></html>");
+        eLabel = new JLabel("<html><pre>Expert        999 second    Unknown</pre></html>");
+        dialog.add(bLabel);dialog.add(iLabel);dialog.add(eLabel);
+        dialog.add(ok);
+        dialog.setBackground(Color.lightGray);
+        dialog.setSize(300, 170);
+        dialog.setResizable(false);
+        dialog.setLocationRelativeTo(null);
+        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);*/
+
+
 
 
         //Setting color, size, itc to the frame
