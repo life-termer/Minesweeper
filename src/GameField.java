@@ -48,7 +48,7 @@ public class GameField extends JFrame {
         leftMines.setBounds(10, 10, 50, 40);
         leftMines.setText("12");
         reset.setBounds((x / 2) - 10, 10, 40, 40);
-        score.setBounds(x - 65, 10, 75, 40);
+        score.setBounds(x - 55, 10, 60, 40);
         leftMines.setBackground(Color.lightGray);
         score.setBackground(Color.lightGray);
         leftMines.setForeground(Color.blue);
@@ -83,6 +83,7 @@ public class GameField extends JFrame {
         gameMenu.add(intermediate);gameMenu.add(expert);gameMenu.addSeparator();
         gameMenu.add(bestT); gameMenu.addSeparator();
         gameMenu.add(exit);
+
 
         //Setting color, size, itc to the frame
         setIconImage(icon);
