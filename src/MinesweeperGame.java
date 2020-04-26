@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Timer;
 
 public class MinesweeperGame extends MouseAdapter implements Runnable {
-    Thread t = null;
-    private static int side = 10;
-    private static int mines = 12;
+    Thread t = new Thread(this);
+    public  int side;
+    private int mines;
     public static GameField gameField;                                             //Declaring game field
     private int countMinesOnField;
     private int countFlags;
@@ -31,10 +31,16 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
     private static final Icon i7 = new ImageIcon("icons/7.png");
     private static final Icon i8 = new ImageIcon("icons/8.png");
     private int time;
+    private int minutes;
+    private String result;
+    private int score;
 
-    public MinesweeperGame() {
-        t = new Thread(this);
-        gameField = new GameField(240, 240, side);   //Creating new game field
+    public MinesweeperGame(int xy, int side, int mines) {
+
+        this.side = side;
+        this.mines = mines;
+        //t = new Thread(this);
+        gameField = new GameField(xy, xy, side);   //Creating new game field
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {                                //Adding Mouse Listener to all buttons
                 gameField.buttons[i][j].addMouseListener(this);
@@ -42,19 +48,14 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
         }
         gameField.reset.addMouseListener(this);
         createGame();
-
         t.start();
-
     }
-
     @Override
     public void mouseClicked(MouseEvent e) {
         switch (e.getButton()) {
             case MouseEvent.BUTTON1: {
                 if (e.getSource() == gameField.reset) {
-                    //firstClick = false;
                     restart();
-                    //minutes = 0;
                     gameField.score.setText("--   :   --");
                 }
                 for (int i = 0; i < side; i++) {
@@ -93,7 +94,6 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
             }
         }
     }
-
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getSource() == gameField.reset) {
@@ -181,13 +181,15 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
     }
 
     private void createGame() {
+        //System.out.println(result + " - " + score);
         time = 0;
+        minutes = 0;
+        score = 0;
         isGameStopped = false;
         countClosedTiles = side * side;
         countMinesOnField = mines;
         countFlags = countMinesOnField;
         gameField.leftMines.setText(String.valueOf(countFlags));
-
 
         Random random = new Random();
         for (int i = 0; i < mines; i++) {
@@ -245,6 +247,8 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
     private void win() {
         showMines();
         isGameStopped = true;
+        result = gameField.score.getText();
+        score = time + (minutes * 60);
     }
 
     private void restart() {
@@ -272,8 +276,6 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
             }
         }
     }
-
-
     @Override
     public void run() {
         int minutes = 0;
@@ -283,9 +285,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
                     time = 0;
                     minutes++;
                 }
-                //if (time % 60 == 0 && time != 0) minutes++;
                 while (isGameStopped) {
-                    minutes = 0;
                     gameField.score.setText(gameField.score.getText());
                 }
                 if (minutes < 10 && time < 10) gameField.score.setText("0" + minutes + " : " +"0" + time);
