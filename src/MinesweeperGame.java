@@ -1,14 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
 
-public class MinesweeperGame extends MouseAdapter implements Runnable {
+public class MinesweeperGame extends MouseAdapter implements Runnable, ActionListener {
     Thread t = new Thread(this);
     public  int side;
     private int mines;
@@ -34,12 +31,41 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
     private int minutes;
     private String result;
     private int score;
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == gameField.newItem) {
+            gameField.setVisible(false);
+            gameField.dispose();
+            initGame(240,10,10);
+        }
+        if(e.getSource() == gameField.beginner){
+            gameField.setVisible(false);
+            gameField.dispose();
+            initGame(240,10,10);
+        }
+        if(e.getSource() == gameField.intermediate){
+            gameField.setVisible(false);
+            gameField.dispose();
+            initGame(400,16,40);
+        }
+        if(e.getSource() == gameField.expert){
+            gameField.setVisible(false);
+            gameField.dispose();
+            initGame(550,22,99);
+        }
+        if(e.getSource() == gameField.exit){
+            //System.exit(0);
+            gameField.dispatchEvent(new WindowEvent(gameField, WindowEvent.WINDOW_CLOSING));
+        }
+    }
 
-    public MinesweeperGame(int xy, int side, int mines) {
+    public MinesweeperGame() {
+        initGame(240,10,10);
+    }
 
+    public void initGame (int xy, int side, int mines) {
         this.side = side;
         this.mines = mines;
-        //t = new Thread(this);
         gameField = new GameField(xy, xy, side);   //Creating new game field
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {                                //Adding Mouse Listener to all buttons
@@ -47,7 +73,14 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
             }
         }
         gameField.reset.addMouseListener(this);
+        gameField.newItem.addActionListener(this);
+        gameField.beginner.addActionListener(this);
+        gameField.intermediate.addActionListener(this);
+        gameField.expert.addActionListener(this);
+        gameField.exit.addActionListener(this);
+
         createGame();
+        if(!t.isAlive())
         t.start();
     }
     @Override
@@ -79,7 +112,6 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
             break;
         }
     }
-
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getSource() == gameField.reset && SwingUtilities.isLeftMouseButton(e))
@@ -182,7 +214,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
 
     private void createGame() {
         //System.out.println(result + " - " + score);
-        time = 0;
+
         minutes = 0;
         score = 0;
         isGameStopped = false;
@@ -202,7 +234,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable {
                 }
             }
         }
-
+        time = 0;
         countMineNeighbors();
     }
 

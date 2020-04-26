@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 
-public class GameField extends JFrame implements ActionListener {
+public class GameField extends JFrame {
     public GameObject[][] buttons;                            //Array of buttons
     public JPanel panelMain;                               //Panel were will be buttons
     public JButton reset, leftMines, score;                 //Some top buttons
@@ -14,6 +14,7 @@ public class GameField extends JFrame implements ActionListener {
     JMenuItem beginner;
     JMenuItem intermediate;
     JMenuItem expert;
+    JMenuItem bestT;
     JMenuItem exit;
     Icon rs = new ImageIcon("icons/reset.png");     //Reset button icon
     Icon tile = new ImageIcon("icons/tile.png");    //Close tile icon
@@ -76,15 +77,12 @@ public class GameField extends JFrame implements ActionListener {
         beginner = new JMenuItem("Beginner");
         intermediate = new JMenuItem("Intermediate");
         expert = new JMenuItem("Expert");
+        bestT = new JMenuItem("Best Times");
         exit = new JMenuItem("Exit");
         gameMenu.add(newItem); gameMenu.addSeparator(); gameMenu.add(beginner);
         gameMenu.add(intermediate);gameMenu.add(expert);gameMenu.addSeparator();
+        gameMenu.add(bestT); gameMenu.addSeparator();
         gameMenu.add(exit);
-        newItem.addActionListener(this);
-        beginner.addActionListener(this);
-        intermediate.addActionListener(this);
-        expert.addActionListener(this);
-        exit.addActionListener(this);
 
         //Setting color, size, itc to the frame
         setIconImage(icon);
@@ -96,19 +94,5 @@ public class GameField extends JFrame implements ActionListener {
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == newItem) {
-            setVisible(false);
-            dispose();
-            new MinesweeperGame(240,10,10);
-            //System.exit(0);
-            //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-        }
-        if(e.getSource() == exit){
-            System.exit(0);
-        }
     }
 }
