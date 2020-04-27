@@ -1,13 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.util.Timer;
 
-public class MinesweeperGame extends MouseAdapter implements Runnable, ActionListener {
-    Thread t = new Thread(this);
-    public int side;
+public class MinesweeperGame extends MouseAdapter implements Runnable, ActionListener, Serializable {
+    private transient Thread t = new Thread(this);
+    private static final long serialVersionUID = 1L;
+    private int side;
     private int mines;
     public static GameField gameField;                                             //Declaring game field
     private int countMinesOnField;
@@ -32,6 +33,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
     private String beginnerResult;
     private String interResult;
     private String expertResult;
+    private String bestResults;
     private int beginnerBest;
     private int interBest;
     private int expertBest;
@@ -44,29 +46,28 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.BEGINNER;
-            initGame(240, 10, 5);
+            initGame(240, 10, 10);
         }
         if (e.getSource() == gameField.beginner) {
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.BEGINNER;
-            initGame(240, 10, 5);
+            initGame(240, 10, 10);
         }
         if (e.getSource() == gameField.intermediate) {
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.INTERMEDIATE;
-            initGame(400, 16, 5);
+            initGame(400, 16, 40);
         }
         if (e.getSource() == gameField.expert) {
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.EXPERT;
-            initGame(550, 22, 5);
+            initGame(550, 22, 99);
         }
         if (e.getSource() == gameField.bestT) {
             Object[] options = {"OK", "Reset"};
-            String bestResults = beginnerResult  + interResult + expertResult;
             int n = JOptionPane.showOptionDialog(gameField, bestResults, "Best Mine Swappers",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
                     null, options,options[0]);
@@ -78,17 +79,14 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         if (e.getSource() == gameField.exit) {
             gameField.dispatchEvent(new WindowEvent(gameField, WindowEvent.WINDOW_CLOSING));
         }
-        /*if(e.getSource() == gameField.ok){
-            gameField.dialog.setVisible(false);
-        }*/
     }
 
     public MinesweeperGame() {
-        resetScore();
-        initGame(240, 10, 3);
+        initGame(240, 10, 10);
     }
 
     public void initGame(int xy, int side, int mines) {
+        load();
         this.side = side;
         this.mines = mines;
         gameField = new GameField(xy, xy, side);   //Creating new game field
@@ -304,10 +302,10 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
     }
 
     private void win() {
-        showMines();
-
         isGameStopped = true;
+        showMines();
         bestTimes();
+        save();
     }
 
     private void restart() {
@@ -370,8 +368,8 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                             JOptionPane.PLAIN_MESSAGE
                     );
                 }
-                beginnerBest = time;
-                beginnerResult = "Beginner             " + beginnerBest +
+                beginnerBest = time - 1;
+                beginnerResult = "Beginner:            " + beginnerBest +
                         " seconds       " + beginner + "\n\n";
             }
             break;
@@ -385,8 +383,8 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                             JOptionPane.PLAIN_MESSAGE
                     );
                 }
-                interBest = time;
-                interResult ="Intermediate      " + interBest +
+                interBest = time - 1;
+                interResult ="Intermediate:     " + interBest +
                         " seconds       " + inter + "\n\n";
             }
             break;
@@ -399,21 +397,62 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                             "Best Time!",
                             JOptionPane.PLAIN_MESSAGE
                     );
-                    expertBest = time;
-                    expertResult ="Expert                 " + expertBest +
+                    expertBest = time - 1;
+                    expertResult ="Expert:                " + expertBest +
                             " seconds       " + expert + "\n\n";
+
                 }
                 break;
             }
         }
+        bestResults = beginnerResult  + interResult + expertResult;
     }
 
     private void resetScore(){
-        beginnerResult = "Beginner             999 seconds       Unknown\n\n";
-        interResult = "Intermediate      999 seconds       Unknown\n\n";
-        expertResult = "Expert                 999 seconds       Unknown\n\n";
+        beginnerResult = "Beginner:            999 seconds       Unknown\n\n";
+        interResult = "Intermediate:     999 seconds       Unknown\n\n";
+        expertResult = "Expert:                999 seconds       Unknown\n\n";
         beginnerBest = 999;
         interBest = 999;
         expertBest = 999;
+        bestResults = beginnerResult  + interResult + expertResult;
+        save();
+    }
+    private void save(){
+        try{
+            FileOutputStream fileOutputStream = new FileOutputStream("minesweeper.ser");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(this);
+            objectOutputStream.close();
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void load(){
+        MinesweeperGame loadGame = null;
+        try {
+            FileInputStream fileInputStream = new FileInputStream("minesweeper.ser");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            loadGame = (MinesweeperGame) objectInputStream.readObject();
+            objectInputStream.close();
+            fileInputStream.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        assert loadGame != null;
+        this.beginnerResult = loadGame.beginnerResult;
+        this.interResult = loadGame.interResult;
+        this.expertResult = loadGame.expertResult;
+        this.bestResults = loadGame.bestResults;
+        this.beginnerBest = loadGame.beginnerBest;
+        this.interBest = loadGame.interBest;
+        this.expertBest = loadGame.expertBest;
+
+    }
+    public static void main(String[] args) {
+        new MinesweeperGame();
     }
 }

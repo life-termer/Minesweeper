@@ -1,17 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
 
 public class GameField extends JFrame {
     public GameObject[][] buttons;                            //Array of buttons
     public JPanel panelMain;                               //Panel were will be buttons
     public JButton reset, leftMines, score, ok;                 //Some top buttons
     public JMenuBar menuBar;
-    //public JDialog dialog;
-    //public JLabel bLabel, iLabel, eLabel;
     JMenuItem newItem;
     JMenuItem beginner;
     JMenuItem intermediate;
@@ -21,7 +16,6 @@ public class GameField extends JFrame {
     Icon rs = new ImageIcon("icons/reset.png");     //Reset button icon
     Icon tile = new ImageIcon("icons/tile.png");    //Close tile icon
     Image icon = Toolkit.getDefaultToolkit().getImage("icons/minesweeper.png");//Game icon
-
 
     public GameField(int x, int y, int side) {
         super("Minesweeper");                           //Game title
@@ -43,7 +37,6 @@ public class GameField extends JFrame {
 
         //Initializing, setting positions, text, background and colors for top buttons
         leftMines = new JButton();
-        //leftMines.setEnabled(false);
         score = new JButton("0");
         reset = new JButton();
         reset.setIcon(rs);
@@ -64,7 +57,6 @@ public class GameField extends JFrame {
         reset.setFocusPainted(false);
         reset.setBorderPainted(false);
         reset.setContentAreaFilled(false);
-        //reset.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 
         add(panelMain);                                 //Adding panel and buttons to the frame
         add(leftMines);
@@ -85,22 +77,6 @@ public class GameField extends JFrame {
         gameMenu.add(intermediate);gameMenu.add(expert);gameMenu.addSeparator();
         gameMenu.add(bestT); gameMenu.addSeparator();
         gameMenu.add(exit);
-
-        /*dialog = new JDialog(this, "Best Mine Swappers", true);
-        dialog.setLayout(new FlowLayout(FlowLayout.CENTER));
-        ok = new JButton("OK");
-        bLabel = new JLabel("<html><pre><u>Beginner</u>      999 second    Unknown</pre></html>");
-        iLabel = new JLabel("<html><pre>Intermediate  999 second    Unknown</pre></html>");
-        eLabel = new JLabel("<html><pre>Expert        999 second    Unknown</pre></html>");
-        dialog.add(bLabel);dialog.add(iLabel);dialog.add(eLabel);
-        dialog.add(ok);
-        dialog.setBackground(Color.lightGray);
-        dialog.setSize(300, 170);
-        dialog.setResizable(false);
-        dialog.setLocationRelativeTo(null);
-        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);*/
-
-
 
 
         //Setting color, size, itc to the frame
