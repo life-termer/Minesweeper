@@ -10,16 +10,16 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
     private static final long serialVersionUID = 1L;
     private int side;
     private int mines;
-    public static GameField gameField;                                             //Declaring game field
+    private GameField gameField;
     private int countMinesOnField;
     private int countFlags;
     public static boolean isGameStopped;
     private int countClosedTiles;
-    private static final Icon rs2 = new ImageIcon("icons/reset1.png");            //Another reset icons
+    private static final Icon rs2 = new ImageIcon("icons/reset1.png");
     private static final Icon open = new ImageIcon("icons/open.png");
     private static final Icon dead = new ImageIcon("icons/dead.png");
-    private static final Icon bomb = new ImageIcon("icons/bomb.png");             //Bomb icon
-    private static final Icon flag = new ImageIcon("icons/flag.png");             //Flag icon
+    private static final Icon bomb = new ImageIcon("icons/bomb.png");
+    private static final Icon flag = new ImageIcon("icons/flag.png");
     private static final Icon i1 = new ImageIcon("icons/1.png");
     private static final Icon i2 = new ImageIcon("icons/2.png");
     private static final Icon i3 = new ImageIcon("icons/3.png");
@@ -89,7 +89,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         load();
         this.side = side;
         this.mines = mines;
-        gameField = new GameField(xy, xy, side);   //Creating new game field
+        gameField = new GameField(xy, xy, side);                            //Creating new game field
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {                                //Adding Mouse Listener to all buttons
                 gameField.buttons[i][j].addMouseListener(this);

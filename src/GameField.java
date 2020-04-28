@@ -4,18 +4,18 @@ import java.awt.event.KeyEvent;
 
 public class GameField extends JFrame {
     public GameObject[][] buttons;                            //Array of buttons
-    public JPanel panelMain;                               //Panel were will be buttons
-    public JButton reset, leftMines, score, ok;                 //Some top buttons
-    public JMenuBar menuBar;
-    JMenuItem newItem;
-    JMenuItem beginner;
-    JMenuItem intermediate;
-    JMenuItem expert;
-    JMenuItem bestT;
-    JMenuItem exit;
-    Icon rs = new ImageIcon("icons/reset.png");     //Reset button icon
-    Icon tile = new ImageIcon("icons/tile.png");    //Close tile icon
-    Image icon = Toolkit.getDefaultToolkit().getImage("icons/minesweeper.png");//Game icon
+    private JPanel panelMain;                               //Panel were will be buttons
+    public JButton reset, leftMines, score;                 //Some top buttons
+    private JMenuBar menuBar;
+    public JMenuItem newItem;
+    public JMenuItem beginner;
+    public JMenuItem intermediate;
+    public JMenuItem expert;
+    public JMenuItem bestT;
+    public JMenuItem exit;
+    public Icon rs = new ImageIcon("icons/reset.png");     //Reset button icon
+    public Icon tile = new ImageIcon("icons/tile.png");    //Close tile icon
+    private Image icon = Toolkit.getDefaultToolkit().getImage("icons/minesweeper.png");//Game icon
 
     public GameField(int x, int y, int side) {
         super("Minesweeper");                           //Game title
