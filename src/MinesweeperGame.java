@@ -70,8 +70,8 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
             Object[] options = {"OK", "Reset"};
             int n = JOptionPane.showOptionDialog(gameField, bestResults, "Best Mine Swappers",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
-                    null, options,options[0]);
-            if(n == 1) {
+                    null, options, options[0]);
+            if (n == 1) {
                 resetScore();
             }
         }
@@ -384,7 +384,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                     );
                 }
                 interBest = time - 1;
-                interResult ="Intermediate:     " + interBest +
+                interResult = "Intermediate:     " + interBest +
                         " seconds       " + inter + "\n\n";
             }
             break;
@@ -398,28 +398,29 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                             JOptionPane.PLAIN_MESSAGE
                     );
                     expertBest = time - 1;
-                    expertResult ="Expert:                " + expertBest +
+                    expertResult = "Expert:                " + expertBest +
                             " seconds       " + expert + "\n\n";
 
                 }
                 break;
             }
         }
-        bestResults = beginnerResult  + interResult + expertResult;
+        bestResults = beginnerResult + interResult + expertResult;
     }
 
-    private void resetScore(){
+    private void resetScore() {
         beginnerResult = "Beginner:            999 seconds       Unknown\n\n";
         interResult = "Intermediate:     999 seconds       Unknown\n\n";
         expertResult = "Expert:                999 seconds       Unknown\n\n";
         beginnerBest = 999;
         interBest = 999;
         expertBest = 999;
-        bestResults = beginnerResult  + interResult + expertResult;
+        bestResults = beginnerResult + interResult + expertResult;
         save();
     }
-    private void save(){
-        try{
+
+    private void save() {
+        try {
             FileOutputStream fileOutputStream = new FileOutputStream("minesweeper.ser");
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(this);
@@ -430,7 +431,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
-    private void load(){
+    private void load() {
         MinesweeperGame loadGame = null;
         try {
             FileInputStream fileInputStream = new FileInputStream("minesweeper.ser");
@@ -442,16 +443,18 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         } catch (Exception e) {
             e.printStackTrace();
         }
-        assert loadGame != null;
-        this.beginnerResult = loadGame.beginnerResult;
-        this.interResult = loadGame.interResult;
-        this.expertResult = loadGame.expertResult;
-        this.bestResults = loadGame.bestResults;
-        this.beginnerBest = loadGame.beginnerBest;
-        this.interBest = loadGame.interBest;
-        this.expertBest = loadGame.expertBest;
+        if (loadGame != null) {
+            this.beginnerResult = loadGame.beginnerResult;
+            this.interResult = loadGame.interResult;
+            this.expertResult = loadGame.expertResult;
+            this.bestResults = loadGame.bestResults;
+            this.beginnerBest = loadGame.beginnerBest;
+            this.interBest = loadGame.interBest;
+            this.expertBest = loadGame.expertBest;
+        }else resetScore();
 
     }
+
     public static void main(String[] args) {
         new MinesweeperGame();
     }
