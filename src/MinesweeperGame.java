@@ -6,30 +6,32 @@ import java.util.*;
 import java.util.List;
 
 public class MinesweeperGame extends MouseAdapter implements Runnable, ActionListener, Serializable {
-    private transient Thread t = new Thread(this);
+    private transient Thread t = new Thread(this);      //New thread for timer
     private static final long serialVersionUID = 1L;
-    private int side;
-    private int mines;
+    private int side;                   //Variable for frame side
+    private int mines;                  //Variable for mines quantity
     private GameField gameField;
     private int countMinesOnField;
-    private int countFlags;
-    public static boolean isGameStopped;
-    private int countClosedTiles;
-    private static final Icon rs2 = new ImageIcon("icons/reset1.png");
-    private static final Icon open = new ImageIcon("icons/open.png");
-    private static final Icon dead = new ImageIcon("icons/dead.png");
-    private static final Icon bomb = new ImageIcon("icons/bomb.png");
-    private static final Icon flag = new ImageIcon("icons/flag.png");
-    private static final Icon i1 = new ImageIcon("icons/1.png");
-    private static final Icon i2 = new ImageIcon("icons/2.png");
-    private static final Icon i3 = new ImageIcon("icons/3.png");
-    private static final Icon i4 = new ImageIcon("icons/4.png");
-    private static final Icon i5 = new ImageIcon("icons/5.png");
-    private static final Icon i6 = new ImageIcon("icons/6.png");
-    private static final Icon i7 = new ImageIcon("icons/7.png");
-    private static final Icon i8 = new ImageIcon("icons/8.png");
+    private int countFlags;             //Variable to count flag marked tiles
+    public boolean isGameStopped;
+    private int countClosedTiles;       //Variable to count how much close tiles left
+    //Create icons for the game
+    private final Icon rs2 = new ImageIcon("icons/reset1.png");
+    private final Icon open = new ImageIcon("icons/open.png");
+    private final Icon dead = new ImageIcon("icons/dead.png");
+    private final Icon bomb = new ImageIcon("icons/bomb.png");
+    private final Icon flag = new ImageIcon("icons/flag.png");
+    private final Icon i1 = new ImageIcon("icons/1.png");
+    private final Icon i2 = new ImageIcon("icons/2.png");
+    private final Icon i3 = new ImageIcon("icons/3.png");
+    private final Icon i4 = new ImageIcon("icons/4.png");
+    private final Icon i5 = new ImageIcon("icons/5.png");
+    private final Icon i6 = new ImageIcon("icons/6.png");
+    private final Icon i7 = new ImageIcon("icons/7.png");
+    private final Icon i8 = new ImageIcon("icons/8.png");
     private GameType gameType = GameType.BEGINNER;
-    private int time;
+    private int time;   //Variable to count time
+    //Variables to store times and results for each game types
     private String beginnerResult;
     private String interResult;
     private String expertResult;
@@ -38,35 +40,36 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
     private int interBest;
     private int expertBest;
 
-    private boolean firstClick;
+    private boolean firstClick;     //Variable to start timer
 
+    //Invoked when an action occurs.
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == gameField.newItem) {
+        if (e.getSource() == gameField.newItem) {       //If menu item "newItem" pressed
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.BEGINNER;
             initGame(240, 10, 10);
         }
-        if (e.getSource() == gameField.beginner) {
+        if (e.getSource() == gameField.beginner) {      //If menu item "beginner" pressed
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.BEGINNER;
             initGame(240, 10, 10);
         }
-        if (e.getSource() == gameField.intermediate) {
+        if (e.getSource() == gameField.intermediate) {  //If menu item "intermediate" pressed
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.INTERMEDIATE;
             initGame(400, 16, 40);
         }
-        if (e.getSource() == gameField.expert) {
+        if (e.getSource() == gameField.expert) {        //If menu item "expert" pressed
             gameField.setVisible(false);
             gameField.dispose();
             gameType = GameType.EXPERT;
             initGame(550, 22, 99);
         }
-        if (e.getSource() == gameField.bestT) {
+        if (e.getSource() == gameField.bestT) {         //If menu item "bestT" pressed
             Object[] options = {"OK", "Reset"};
             int n = JOptionPane.showOptionDialog(gameField, bestResults, "Best Mine Swappers",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
@@ -76,22 +79,25 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
             }
         }
 
-        if (e.getSource() == gameField.exit) {
+        if (e.getSource() == gameField.exit) {      //If menu item "exit" pressed
             gameField.dispatchEvent(new WindowEvent(gameField, WindowEvent.WINDOW_CLOSING));
         }
     }
 
+    //Class constructor
     public MinesweeperGame() {
         initGame(240, 10, 10);
     }
 
+    /*Method loads saved class, creates new gameField, sets frame and panel sides,
+    mines from method parameters, adds MouseListener to all buttons.*/
     public void initGame(int xy, int side, int mines) {
         load();
         this.side = side;
         this.mines = mines;
-        gameField = new GameField(xy, xy, side);                            //Creating new game field
+        gameField = new GameField(xy, xy, side);
         for (int i = 0; i < side; i++) {
-            for (int j = 0; j < side; j++) {                                //Adding Mouse Listener to all buttons
+            for (int j = 0; j < side; j++) {
                 gameField.buttons[i][j].addMouseListener(this);
             }
         }
@@ -104,15 +110,16 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         gameField.bestT.addActionListener(this);
 
         createGame();
-        if (!t.isAlive())
+        if (!t.isAlive())       //If thread isn't already running
             t.start();
     }
 
+    /*Called just after the user clicks the listened-to component*/
     @Override
     public void mouseClicked(MouseEvent e) {
         switch (e.getButton()) {
-            case MouseEvent.BUTTON1: {
-                firstClick = true;
+            case MouseEvent.BUTTON1: {          //Left mouse button click
+                firstClick = true;              //Start the timer
                 if (e.getSource() == gameField.reset) {
                     restart();
                 }
@@ -125,7 +132,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                 }
             }
             break;
-            case MouseEvent.BUTTON3: {
+            case MouseEvent.BUTTON3: {      //Right mouse button click
                 for (int i = 0; i < side; i++) {
                     for (int j = 0; j < side; j++) {
                         if (e.getSource() == gameField.buttons[i][j]) {
@@ -138,6 +145,8 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
+    /*Called just after the user presses a mouse button while
+    the cursor is over the listened-to component.*/
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getSource() == gameField.reset && SwingUtilities.isLeftMouseButton(e))
@@ -153,6 +162,8 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
+    /*Called just after the user releases a mouse button after
+    a mouse press over the listened-to component.*/
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getSource() == gameField.reset) {
@@ -169,6 +180,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
+    /*Method to change some variables and icon of tiles after left mouse click*/
     private void openTile(GameObject object) {
         if (!object.isFlag && !object.isOpen && !isGameStopped) {
             if (object.isMine) {
@@ -176,7 +188,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                 object.isOpen = true;
                 countClosedTiles--;
                 gameField.reset.setIcon(dead);
-                gameOver();
+                gameOver();         //Game is over when the tile is marked as bomb
                 object.setBackground(Color.red);
             } else if (object.countMineNeighbors == 0) {
                 object.isOpen = true;
@@ -184,10 +196,11 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                 object.setEnabled(false);
                 countClosedTiles--;
                 List<GameObject> objects = getNeighbors(object);
+                //If tile doesn't have bomb-marked neighbors, then apply this method to it's neighbors
                 for (GameObject gameObject : objects) {
                     if (!gameObject.isOpen) openTile(gameObject);
                 }
-            } else {
+            } else {   //Set icon with number depending on how many bomb-marked neighbors the tile has
                 object.isOpen = true;
                 object.setEnabled(false);
                 countClosedTiles--;
@@ -219,12 +232,14 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
                 }
             }
         }
+        //The game is won, if quantity of closed tiles is equal mines quantity
         if (countMinesOnField == countClosedTiles && !object.isMine && !isGameStopped) {
             win();
             gameField.reset.setIcon(rs2);
         }
     }
 
+    /*Mark the tile with flag icon after right mouse click*/
     private void markTile(GameObject object) {
         if (!object.isFlag && !object.isOpen && !isGameStopped) {
             object.isFlag = true;
@@ -239,6 +254,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
+    /*Initialize some object variables, and randomly mark some tiles as bombs*/
     private void createGame() {
         isGameStopped = false;
         firstClick = false;
@@ -263,6 +279,8 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         countMineNeighbors();
     }
 
+    /*Method counts how many bomb-marked neighbors the tile has and
+    writes it to countMineNeighbors variable of the tile*/
     private void countMineNeighbors() {
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {
@@ -277,6 +295,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
+    /*Method finds neighbors of the tile and add it to the list of buttons*/
     private List<GameObject> getNeighbors(GameObject gameObject) {
         List<GameObject> result = new ArrayList<>();
         for (int i = gameObject.x - 1; i <= gameObject.x + 1; i++) {
@@ -296,11 +315,14 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         return result;
     }
 
+    /*If game is lost method stops the game and shows mines*/
     private void gameOver() {
         showMines();
         isGameStopped = true;
     }
 
+    /*If game is won method stops the game, shows mines, writes the best time
+    and saves class*/
     private void win() {
         isGameStopped = true;
         showMines();
@@ -308,6 +330,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         save();
     }
 
+    /*Method rewrites variables of all buttons and create new game*/
     private void restart() {
         firstClick = false;
         for (int i = 0; i < side; i++) {
@@ -324,6 +347,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         createGame();
     }
 
+    /*Set bomb icon to all bomb-marked tiles*/
     private void showMines() {
         for (int i = 0; i < side; i++) {
             for (int j = 0; j < side; j++) {
@@ -335,6 +359,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
+    /*Run the thread to count time*/
     @Override
     public void run() {
         try {
@@ -353,11 +378,14 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
+    /*Rewrites best times and results depending on GameType*/
     private void bestTimes() {
         String beginner = "";
         String inter = "";
         String expert = "";
         switch (gameType) {
+            /*If the time is lower than the best one, show Input Dialog window and
+            get the user's input from a dialog*/
             case BEGINNER: {
                 if (time < beginnerBest) {
                     beginner = (String) JOptionPane.showInputDialog(
@@ -408,6 +436,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         bestResults = beginnerResult + interResult + expertResult;
     }
 
+    /*Rewrite best time and results to default*/
     private void resetScore() {
         beginnerResult = "Beginner:            999 seconds       Unknown\n\n";
         interResult = "Intermediate:     999 seconds       Unknown\n\n";
@@ -419,6 +448,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         save();
     }
 
+    /*Save the class to a file using serialization*/
     private void save() {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream("minesweeper.ser");
@@ -431,6 +461,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
         }
     }
 
+    /*Load the class from a file using deserialization*/
     private void load() {
         MinesweeperGame loadGame = null;
         try {
@@ -455,6 +486,7 @@ public class MinesweeperGame extends MouseAdapter implements Runnable, ActionLis
 
     }
 
+    /*Start the game by creating instance of MinesweeperGame class*/
     public static void main(String[] args) {
         new MinesweeperGame();
     }

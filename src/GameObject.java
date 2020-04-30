@@ -2,7 +2,7 @@ import javax.swing.*;
 
 public class GameObject extends JButton{
 
-    public int x;
+    public int x;                       //Coordinates of the button
     public int y;
     public boolean isMine;              //If button is bomb
     public int countMineNeighbors;      //How many mine neighbors button has
